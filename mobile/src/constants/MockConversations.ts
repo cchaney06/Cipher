@@ -3,7 +3,7 @@ import { Conversation } from "../types/Conversation";
 export const mockConversations: Conversation[] = [
   {
     id: "1",
-    name: "Alex Johnson",
+    name: "Ryan Gerik",
     lastMessage: "Are you free tonight?",
     lastMessageAt: "2026-09-16T16:12:00-05:00",
     unreadCount: 2,
@@ -27,6 +27,13 @@ export const mockConversations: Conversation[] = [
     name: "Morgan Lee",
     lastMessage: "Thanks!",
     lastMessageAt: "2026-09-15T21:42:00-05:00",
+    unreadCount: 0,
+  },
+  {
+    id: "5",
+    name: "Casey Brown",
+    lastMessage: "",
+    lastMessageAt: "2026-09-17T12:00:00-05:00",
     unreadCount: 0,
   },
 ];
