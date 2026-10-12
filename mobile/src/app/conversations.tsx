@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 import ConversationRow from "../components/ConversationRow";
 import { mockConversations } from "../constants/MockConversations";
@@ -9,7 +9,18 @@ export default function Conversations() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Messages</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Messages</Text>
+        <Pressable
+          onPress={() => router.push("/settings")}
+          style={({ pressed }) => [
+            styles.settingsButton,
+            pressed && styles.settingsButtonPressed,
+          ]}
+        >
+          <Text style={styles.settingsText}>Settings</Text>
+        </Pressable>
+      </View>
 
       <FlatList
         data={mockConversations}
@@ -52,8 +63,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    paddingHorizontal: 20,
-    marginBottom: 12,
   },
 
   separator: {
@@ -78,5 +87,27 @@ const styles = StyleSheet.create({
     color: "#666",
     marginTop: 8,
     textAlign: "center",
+  },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+
+  settingsButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+  },
+
+  settingsButtonPressed: {
+    opacity: 0.5,
+  },
+
+  settingsText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

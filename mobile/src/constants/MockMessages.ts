@@ -1,5 +1,7 @@
 import { Message } from "../types/Message";
 
+import { mockCurrentUser } from "./MockCurrentUser";
+
 export const mockMessages: Record<string, Message[]> = {
   "1": [
     {
@@ -10,7 +12,7 @@ export const mockMessages: Record<string, Message[]> = {
     },
     {
       id: "2",
-      senderId: "current-user",
+      senderId: mockCurrentUser.id,
       content: "Yeah, I should be.",
       createdAt: "2026-09-17T10:17:00-05:00",
     },
@@ -31,7 +33,7 @@ export const mockMessages: Record<string, Message[]> = {
     },
     {
       id: "5",
-      senderId: "current-user",
+      senderId: mockCurrentUser.id,
       content: "Yep!",
       createdAt: "2026-09-16T14:32:00-05:00",
     },
@@ -49,7 +51,7 @@ export const mockMessages: Record<string, Message[]> = {
   "4": [
     {
       id: "7",
-      senderId: "current-user",
+      senderId: mockCurrentUser.id,
       content: "Thanks for the help!",
       createdAt: "2026-09-15T21:40:00-05:00",
     },
