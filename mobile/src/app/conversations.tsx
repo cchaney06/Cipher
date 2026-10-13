@@ -1,17 +1,37 @@
 import { useRouter } from "expo-router";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 import ConversationRow from "../components/ConversationRow";
 import { mockConversations } from "../constants/MockConversations";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
 export default function Conversations() {
   const router = useRouter();
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredConversations = mockConversations.filter((conversation) =>
+    conversation.name.toLowerCase().includes(searchQuery.trim().toLowerCase()),
+  );
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <View style={styles.header}>
         <Text style={styles.title}>Messages</Text>
+
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open settings"
           onPress={() => router.push("/settings")}
           style={({ pressed }) => [
             styles.settingsButton,
@@ -22,8 +42,18 @@ export default function Conversations() {
         </Pressable>
       </View>
 
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        autoCapitalize="none"
+        autoCorrect={false}
+        clearButtonMode="while-editing"
+      />
+
       <FlatList
-        data={mockConversations}
+        data={filteredConversations}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <ConversationRow
@@ -41,22 +71,27 @@ export default function Conversations() {
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>No conversations yet</Text>
+            <Text style={styles.emptyTitle}>
+              {searchQuery.trim() === ""
+                ? "No conversations yet"
+                : "No conversations found"}
+            </Text>
 
             <Text style={styles.emptyText}>
-              Your conversations will appear here.
+              {searchQuery.trim() === ""
+                ? "Your conversations will appear here."
+                : "Try searching for a different name."}
             </Text>
           </View>
         }
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 70,
     backgroundColor: "#fff",
   },
 
@@ -109,5 +144,15 @@ const styles = StyleSheet.create({
   settingsText: {
     fontSize: 16,
     fontWeight: "600",
+  },
+
+  searchInput: {
+    marginHorizontal: 20,
+    marginBottom: 12,
+    paddingHorizontal: 14,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: "#f2f2f2",
+    fontSize: 16,
   },
 });

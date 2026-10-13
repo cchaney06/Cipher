@@ -4,6 +4,8 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { mockCurrentUser } from "../constants/MockCurrentUser";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
 export default function Settings() {
   const router = useRouter();
 
@@ -13,7 +15,10 @@ export default function Settings() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView
+      style={styles.container}
+      edges={["top", "left", "right", "bottom"]}
+    >
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Text style={styles.backText}>Back</Text>
@@ -46,10 +51,15 @@ export default function Settings() {
           <Text style={styles.rowValue}>Local prototype</Text>
         </View>
       </View>
-      <Pressable style={styles.logoutButton} onPress={handleLogout}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Log out"
+        style={styles.logoutButton}
+        onPress={handleLogout}
+      >
         <Text style={styles.logoutText}>Log Out</Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -57,7 +67,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: 60,
   },
 
   header: {

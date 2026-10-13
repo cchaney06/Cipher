@@ -1,5 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { mockCurrentUser } from "../../constants/MockCurrentUser";
 
 import {
   FlatList,
@@ -17,6 +18,8 @@ import { mockConversations } from "../../constants/MockConversations";
 import { mockMessages } from "../../constants/MockMessages";
 import { Message } from "../../types/Message";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
 export default function Chat() {
   const router = useRouter();
 
@@ -30,6 +33,8 @@ export default function Chat() {
 
   const [newMessage, setNewMessage] = useState("");
 
+  const messageListRef = useRef<FlatList<Message>>(null);
+
   function handleSend() {
     const trimmedMessage = newMessage.trim();
 
@@ -39,7 +44,7 @@ export default function Chat() {
 
     const message: Message = {
       id: Date.now().toString(),
-      senderId: "current-user",
+      senderId: mockCurrentUser.id,
       content: trimmedMessage,
       createdAt: new Date().toISOString(),
     };
@@ -58,44 +63,60 @@ export default function Chat() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={["top", "left", "right", "bottom"]}
     >
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>Back</Text>
-        </Pressable>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <View style={styles.header}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Back to conversation"
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <Text style={styles.backText}>Back</Text>
+          </Pressable>
 
-        <Text style={styles.name}>{conversation.name}</Text>
-      </View>
+          <Text style={styles.name}>{conversation.name}</Text>
+        </View>
 
-      <FlatList
-        data={messages}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <MessageBubble
-            message={item}
-            isMine={item.senderId === "current-user"}
-          />
-        )}
-        contentContainerStyle={styles.messageList}
-        keyboardShouldPersistTaps="handled"
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>No messages yet</Text>
+        <FlatList
+          ref={messageListRef}
+          data={messages}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <MessageBubble
+              message={item}
+              isMine={item.senderId === mockCurrentUser.id}
+            />
+          )}
+          contentContainerStyle={styles.messageList}
+          keyboardShouldPersistTaps="handled"
+          onContentSizeChange={() => {
+            messageListRef.current?.scrollToEnd({
+              animated: true,
+            });
+          }}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyTitle}>No messages yet</Text>
 
-            <Text style={styles.emptyText}>Send the first message.</Text>
-          </View>
-        }
-      />
+              <Text style={styles.emptyText}>Send the first message.</Text>
+            </View>
+          }
+        />
 
-      <MessageInput
-        value={newMessage}
-        onChangeText={setNewMessage}
-        onSend={handleSend}
-      />
-    </KeyboardAvoidingView>
+        <MessageInput
+          value={newMessage}
+          onChangeText={setNewMessage}
+          onSend={handleSend}
+        />
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -106,7 +127,6 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    paddingTop: 58,
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
@@ -157,5 +177,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#666",
     marginTop: 6,
+  },
+
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
 });
