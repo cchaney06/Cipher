@@ -8,26 +8,52 @@ Cipher currently consists of two application components and a database service:
 - Node.js/TypeScript HTTP API using Express
 - PostgreSQL development database running through Docker
 
-The mobile client still uses local mock data and is not yet connected to the backend API.
+The mobile client is now connected to the backend API for backend health information and database-backend user data.
+
+Conversation and message data still use local mock data in the mobile application.
 
 The Express backend is connected to PostgreSQL and uses the database for persistent user storage.
 
 ## Mobile Client
 
-```text
+The React Native client currently uses both local mock data and real backend API requests.
 
-Mock Data
-   |
-   v
-React Native
-   |
-   v
-Cipher UI
+```text
+                  React Native
+                    /      \
+                   /        \
+                  v          v
+         Local Mock Data   API Service
+              |                |
+              v                v
+     Conversations /       Express API
+        Messages
 ```
+
+Local mock data is still used for:
+
+- Conversations
+- Messages
+- Simulated current-user information
+- Simulated login behavior
+
+The backend API is currently used for:
+
+- Server health status
+- Database connectivity status
+- Retrieving database-backed user information
+
+The mobile API service is located in:
+
+```text
+mobile/src/services/api.ts
+```
+
+During local development, the physical iPhone connects to the backend over the Windows mobile hotspot using the Lenovo's local network address.
 
 ## Current Backend
 
-The Cipher backend currently uses Node.js, TypeScript, and Express.
+The Cipher backend currently uses Node.js, TypeScript, Express, and node-postgres.
 
 Implemented endpoints:
 
@@ -87,18 +113,22 @@ Docker Volume
 ## Current System Architecture
 
 ```text
-                    Cipher
+                       Cipher
 
-        ┌──────────────────────────┐
-        │                          │
-        v                          v
-
- Mobile Client                Express API
- React Native                 Node.js
-     |                            |
-     v                            | SQL
- Mock Data                       v
-                             PostgreSQL
+                    Mobile Client
+                    React Native
+                      /       \
+                     /         \
+                    v           v
+          Local Mock Data     API Service
+              |                   |
+              v                   | HTTP
+      Conversations /             v
+         Messages             Express API
+                                  |
+                                  | SQL
+                                  v
+                              PostgreSQL
                                   |
                                   v
                               users table
@@ -107,9 +137,11 @@ Docker Volume
                             Docker Volume
 ```
 
-The mobile client has not yet been connected to the Express API.
+The mobile client can now communicate with the Express API over the local development network.
 
-The backend and database are connected, but the mobile application still relies on local mock data.
+The backend and PostgreSQL database are connected, and the mobile client can retrieve real backend status and database-backed user information.
+
+Conversation and message data have not yet been moved to the backend and still rely on local mock data.
 
 ## Planned Architecture
 
@@ -136,6 +168,16 @@ The server will eventually handle:
 
 The mobile client will communicate with the backend through HTTPS for standard API requests and WebSockets for real-time messaging.
 
+Conversation and message data will eventually be stored and retrieved through the backend instead of local mock data.
+
+## Development Networking
+
+During local development, the mobile client currently communicates with the Express backend over HTTP through a Windows mobile hotspot.
+
+This local HTTP setup is for development only.
+
+Production communication is planned to use HTTPS.
+
 ## Security Architecture
 
 Message encryption and decryption will occur on client devices rather than on the server.
@@ -144,4 +186,8 @@ The long-term goal is for the server to handle message delivery without having a
 
 Database queries that include user-supplied values use parameterized SQL queries rather than directly inserting those values into SQL strings.
 
-End-to-end encryption has not yet been implemented in the current prototype.
+Database credentials are loaded from ignored environment files and are not stored directly in source code.
+
+The current local mobile-to-backend connection uses HTTP for development and does not yet provide production transport security.
+
+Authentication, authorization, and end-to-end encryption have not yet been implemented in the current prototype.

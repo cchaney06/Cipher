@@ -35,11 +35,16 @@ Implemented:
 - Persistent database-backend user retrieval
 - Persistent database-backend user creation
 - Parameterized SQL queries for user-supplied values
+- Mobile-to-backend API connectivity
+- Reusable React Native API service
+- Backend connectivity status in the mobile client
+- Database-backed user data retrieval from the mobile client
 
 Not yet implemented:
 
 - Real user authentication
-- Mobile client connection to the backend API
+- Backend-driven conversations
+- Backend-driven messages
 - Real-time networking
 - End-to-end encryption
 - Push notifications
@@ -106,7 +111,12 @@ cipher/
 - Added a reusable PostgreSQL connection pool
 - Added database-aware backend health checks
 - Added parameterized SQL queries for user operations
+- Connected the React Native mobile client to the Express API
+- Added a reusable mobile API service
+- Added live backend connectivity status to the Settings screen
+- Added database-backed user count retrieval from the mobile client
+- Verified full-stack communication from the physical iPhone through the API to PostgreSQL
 
 ### Next
 
-- Connect the React Native mobile client to the Express backend API and begin replacing local mock data with real API requests.
+- Expand the database schema to support conversations, conversation membership, and messages. Then begin replacing the mobile client's local conversation and message mock data with backend API data.

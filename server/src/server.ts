@@ -7,7 +7,8 @@ import { usersRouter } from "./routes/users.js";
 
 const app = express();
 
-const PORT = Number(process.env.PORT ?? 3000);;
+const PORT = Number(process.env.PORT ?? 3000);
+const HOST = process.env.HOST ?? "0.0.0.0";
 
 app.use(express.json());
 
@@ -40,6 +41,7 @@ app.get("/health", async (_request, response) => {
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, HOST, () => {
     console.log(`Cipher API running at http://localhost:${PORT}`);
+    console.log(`Listening for local network connections on ${HOST}:${PORT}`);
 });

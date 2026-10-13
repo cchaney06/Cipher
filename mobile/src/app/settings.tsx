@@ -1,5 +1,7 @@
 import { useRouter } from "expo-router";
 
+import { useEffect, useState } from "react";
+
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { mockCurrentUser } from "../constants/MockCurrentUser";
@@ -8,8 +10,58 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "../constants/Theme";
 
+import { getHealth, getUsers } from "../services/api";
+
 export default function Settings() {
   const router = useRouter();
+
+  const [backendStatus, setBackendStatus] = useState<
+    "checking" | "connected" | "unavailable"
+  >("checking");
+
+  const [backendUserCount, setBackendUserCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadBackendStatus() {
+      try {
+        const [health, users] = await Promise.all([getHealth(), getUsers()]);
+
+        if (cancelled) {
+          return;
+        }
+
+        if (health.status === "ok" && health.database === "connected") {
+          setBackendStatus("connected");
+        } else {
+          setBackendStatus("unavailable");
+        }
+
+        setBackendUserCount(users.length);
+      } catch (error) {
+        console.error("Failed to connect to Cipher API:", error);
+
+        if (!cancelled) {
+          setBackendStatus("unavailable");
+          setBackendUserCount(null);
+        }
+      }
+    }
+
+    loadBackendStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const serverStatusText =
+    backendStatus === "checking"
+      ? "Checking..."
+      : backendStatus === "connected"
+        ? "Connected"
+        : "Unavailable";
 
   function handleLogout() {
     router.dismissAll();
@@ -50,7 +102,14 @@ export default function Settings() {
         </View>
         <View style={styles.row}>
           <Text style={styles.rowLabel}>Server</Text>
-          <Text style={styles.rowValue}>Local prototype</Text>
+          <Text style={styles.rowValue}>{serverStatusText}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.rowLabel}>Backend users</Text>
+
+          <Text style={styles.rowValue}>
+            {backendUserCount === null ? "—" : backendUserCount}
+          </Text>
         </View>
       </View>
       <Pressable

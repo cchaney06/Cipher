@@ -18,13 +18,14 @@ Cipher is currently a prototype and does not yet provide end-to-end encryption.
 ## Current Limitations
 
 - Authentication is simulated
-- Messages are still local mock data in the mobile client
-- The mobile client is not yet connected to the backend API
+- Conversations and messages are still local mock data in the mobile client
 - User authentication has not been implemented
+- Authorization has not been implemented
 - Passwords are not yet accepted or stored by the backend
 - No cryptographic protocol has been integrated
 - End-to-end encryption has not yet been implemented
 - Real-time messaging has not yet been implemented
+- Local mobile-to-backend development traffic currently uses HTTP rather than HTTPS
 - No security audit has been performed
 
 ## Backend Security
@@ -39,8 +40,26 @@ Current protections include:
 - API input is validated before user records are created
 - Duplicate usernames are rejected
 - Database errors are handled without intentionally exposing database credentials to clients
+- Backend health checks verify database connectivity
 
 The backend does not currently implement user authentication, authorization, session management, or password handling.
+
+## Mobile-to-Backend Security
+
+The React Native mobile client can communicate with the Express backend over the local development network.
+
+Current development behavior:
+
+- The physical iPhone connects to the backend over a Windows mobile hotspot
+- The development API uses a local network IP address
+- Development API traffic currently uses HTTP
+- The API base URL is configured through an Expo EXPO*PUBLIC* environment variable
+- No secrets are stored in the mobile API URL configuration
+- Conversation and message data are still local mock data
+
+The current local networking setup is intended only for development and should not be treated as production transport security.
+
+Production client/server communication is planned to use HTTPS.
 
 ## Database Security
 
