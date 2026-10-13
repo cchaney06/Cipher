@@ -10,7 +10,7 @@ Cipher currently consists of two application components and a database service:
 
 The mobile client still uses local mock data and is not yet connected to the backend API.
 
-The Express backend currently uses temporary in-memory user data and has not yet been connected to PostgreSQL.
+The Express backend is connected to PostgreSQL and uses the database for persistent user storage.
 
 ## Mobile Client
 
@@ -37,25 +37,29 @@ Implemented endpoints:
 - `GET /api/users/:id`
 - `POST /api/users`
 
-User API data is currently stored in memory for development.
+The Express API retrieves and creates users through PostgreSQL.
+
+Database communication is handled by a reusable node-postgres connection pool. User data is persisted in the PostgreSQL `users` table.
+
+The `/health` endpoint also checks whether the API can successfully communicate with PostgreSQL.
 
 ```text
 HTTP Request
-    │
-    ▼
+    |
+    v
 Express API
-    │
-    ▼
-In-Memory User Data
-    │
-    ▼
+    |
+    | Parameterized SQL
+    v
+PostgreSQL
+    |
+    v
 JSON Response
 ```
 
 ### Current Database
 
-Cipher now uses a local PostgreSQL 18 development database running
-inside Docker.
+Cipher uses a local PostgreSQL 18 development database running inside Docker.
 
 The database currently contains a `users` table with:
 
@@ -66,22 +70,24 @@ The database currently contains a `users` table with:
 
 PostgreSQL data is persisted using a Docker volume.
 
-The PostgreSQL database currently exists separately from the Express API.
-
 ```text
-PostgreSQL 18
-     |
-     v
+Express API
+    |
+    | SQL via node-postgres
+    v
+PostgreSQL
+    |
+    v
 users table
-     |
-     v
-Docker volume
+    |
+    v
+Docker Volume
 ```
 
 ## Current System Architecture
 
 ```text
-Cipher
+                    Cipher
 
         ┌──────────────────────────┐
         │                          │
@@ -90,20 +96,20 @@ Cipher
  Mobile Client                Express API
  React Native                 Node.js
      |                            |
-     v                            v
- Mock Data                 In-Memory Users
-
-
-                         PostgreSQL
-                             |
-                             v
-                         users table
-                             |
-                             v
-                       Docker Volume
+     v                            | SQL
+ Mock Data                       v
+                             PostgreSQL
+                                  |
+                                  v
+                              users table
+                                  |
+                                  v
+                            Docker Volume
 ```
 
-The three components currently operate independently where applicable. The mobile client has not yet been connected to the Express API, and the Express API has not yet been connected to PostgreSQL.
+The mobile client has not yet been connected to the Express API.
+
+The backend and database are connected, but the mobile application still relies on local mock data.
 
 ## Planned Architecture
 
@@ -114,25 +120,28 @@ iPhone
    v
 Node.js API
    |
+   | SQL
    v
 PostgreSQL
 ```
 
 The server will eventually handle:
 
-```text
 - Account authentication
 - User lookup
 - Device registration
 - Message delivery
 - Offline message queues
 - Public-key distribution
-```
+
+The mobile client will communicate with the backend through HTTPS for standard API requests and WebSockets for real-time messaging.
 
 ## Security Architecture
 
 Message encryption and decryption will occur on client devices rather than on the server.
 
 The long-term goal is for the server to handle message delivery without having access to plaintext message contents or users' private messaging keys.
+
+Database queries that include user-supplied values use parameterized SQL queries rather than directly inserting those values into SQL strings.
 
 End-to-end encryption has not yet been implemented in the current prototype.

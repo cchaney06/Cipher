@@ -24,17 +24,22 @@ Implemented:
 - Basic accessibility support
 - Node.js/TypeScript Express backend
 - Backend health endpoint
+- Database-aware health checks
 - User API endpoints
 - Basic API request validation
 - Local PostgreSQL development database
 - Persistent users table
 - Docker-based database environment
+- Express-to-PostgreSQL integration
+- Reusable PostgreSQL connection pool
+- Persistent database-backend user retrieval
+- Persistent database-backend user creation
+- Parameterized SQL queries for user-supplied values
 
 Not yet implemented:
 
 - Real user authentication
 - Mobile client connection to the backend API
-- Express-to-PostgreSQL integration
 - Real-time networking
 - End-to-end encryption
 - Push notifications
@@ -53,6 +58,7 @@ Not yet implemented:
 - Node.js
 - TypeScript
 - Express
+- node-postgres
 
 ### Database
 
@@ -95,7 +101,12 @@ cipher/
 - Created PostgreSQL development database
 - Created persistent users table
 - Added Docker-based database persistence
+- Connected the Express backend to PostgreSQL
+- Replaced temporary in-memory user storage with database queries
+- Added a reusable PostgreSQL connection pool
+- Added database-aware backend health checks
+- Added parameterized SQL queries for user operations
 
 ### Next
 
-- Connect the Node.js/TypeScript backend to PostgreSQL and replace the temporary in-memory user data with persistent database queries. After that, connect the mobile client to the backend API.
+- Connect the React Native mobile client to the Express backend API and begin replacing local mock data with real API requests.
