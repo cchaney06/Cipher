@@ -26,3 +26,14 @@ end-to-end encryption.
 - User creation currently uses in-memory mock data
 - User authentication has not been implemented
 - Passwords are not yet accepted or stored by the backend
+
+## Database Security
+
+Current local development database:
+
+- PostgreSQL runs inside Docker
+- Database credentials are stored in an ignored `.env` file
+- Credentials are not committed to Git
+- Usernames are constrained at the database level
+- Password authentication has not yet been implemented
+- No plaintext passwords are stored

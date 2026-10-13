@@ -4,12 +4,11 @@ Cipher is an end-to-end encrypted messaging application currently
 under development.
 
 The project is being built as a native-style mobile application using
-React Native and Expo, with a Node.js/TypeScript backend planned for
-message delivery and account services.
+React Native and Expo, with a Node.js/TypeScript backend and PostgreSQL database for account and messaging services.
 
 ## Current Status
 
-Cipher is currently in the frontend prototype stage.
+Cipher is currently in the early full-stack prototype stage.
 
 Implemented:
 
@@ -23,12 +22,19 @@ Implemented:
 - Logout navigation
 - Safe-area handling
 - Basic accessibility support
+- Node.js/TypeScript Express backend
+- Backend health endpoint
+- User API endpoints
+- Basic API request validation
+- Local PostgreSQL development database
+- Persistent users table
+- Docker-based database environment
 
 Not yet implemented:
 
 - Real user authentication
-- Backend API
-- Database persistence
+- Mobile client connection to the backend API
+- Express-to-PostgreSQL integration
 - Real-time networking
 - End-to-end encryption
 - Push notifications
@@ -44,16 +50,20 @@ Not yet implemented:
 
 ### Backend
 
-Current:
-
 - Node.js
 - TypeScript
 - Express
 
-Planned:
+### Database
 
 - PostgreSQL
+- Docker
+
+### Planned
+
 - WebSockets
+- End-to-end encryption
+- Push notifications
 
 ## Project Structure
 
@@ -78,8 +88,14 @@ cipher/
 - Added settings/profile screen
 - Added conversation search
 - Improved safe-area and keyboard handling
+- Created Node.js/TypeScript backend
+- Added Express API routes
+- Added user creation and retrieval endpoints
+- Added request validation
+- Created PostgreSQL development database
+- Created persistent users table
+- Added Docker-based database persistence
 
 ### Next
 
-Build the Node.js/TypeScript backend and connect the mobile client
-to an API.
+- Connect the Node.js/TypeScript backend to PostgreSQL and replace the temporary in-memory user data with persistent database queries. After that, connect the mobile client to the backend API.
