@@ -1,5 +1,7 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
+import { Colors } from "../constants/Theme";
+
 interface MessageInputProps {
   value: string;
   onChangeText: (text: string) => void;
@@ -42,8 +44,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: "#eee",
-    backgroundColor: "#fff",
+    borderTopColor: Colors.border,
+    backgroundColor: Colors.background,
     gap: 8,
   },
 
@@ -52,7 +54,7 @@ const styles = StyleSheet.create({
     minHeight: 42,
     maxHeight: 120,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: Colors.inputBorder,
     borderRadius: 21,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -72,5 +74,6 @@ const styles = StyleSheet.create({
   sendText: {
     fontSize: 16,
     fontWeight: "600",
+    color: Colors.primary,
   },
 });

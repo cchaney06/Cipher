@@ -1,56 +1,81 @@
-# Welcome to your Expo app 👋
+# Cipher
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Cipher is an end-to-end encrypted messaging application currently
+under development.
 
-## Get started
+The project is being built as a native-style mobile application using
+React Native and Expo, with a Node.js/TypeScript backend planned for
+message delivery and account services.
 
-1. Install dependencies
+## Current Status
 
-   ```bash
-   npm install
-   ```
+Cipher is currently in the frontend prototype stage.
 
-2. Start the app
+Implemented:
 
-   ```bash
-   npx expo start
-   ```
+- Login interface
+- Conversation list
+- Conversation searching
+- Dynamic chat routes
+- Incoming and outgoing message bubbles
+- Local message sending
+- Settings/profile screen
+- Logout navigation
+- Safe-area handling
+- Basic accessibility support
 
-In the output, you'll find options to open the app in a
+Not yet implemented:
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Real user authentication
+- Backend API
+- Database persistence
+- Real-time networking
+- End-to-end encryption
+- Push notifications
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Technology Stack
 
-## Get a fresh project
+### Mobile
 
-When you're ready, run:
+- React Native
+- Expo
+- Expo Router
+- TypeScript
 
-```bash
-npm run reset-project
+### Backend
+
+Planned:
+
+- Node.js
+- TypeScript
+- PostgreSQL
+- WebSockets
+
+## Project Structure
+
+```text
+cipher/
+├── mobile/
+├── server/
+├── database/
+└── docs/
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Development Milestones
 
-### Other setup steps
+### September 2026
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+- Set up Expo/React Native development environment
+- Ran Cipher on a physical iPhone from Windows
+- Built login UI
+- Built conversation inbox
+- Added dynamic chat routing
+- Built local messaging interface
+- Added settings/profile screen
+- Added conversation search
+- Improved safe-area and keyboard handling
 
-## Learn more
+### Next
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Build the Node.js/TypeScript backend and connect the mobile client
+to an API.

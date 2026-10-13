@@ -15,6 +15,8 @@ import {
 import AppTitle from "../components/AppTitle";
 import PrimaryButton from "../components/PrimaryButton";
 
+import { Colors } from "../constants/Theme";
+
 export default function Index() {
   const router = useRouter();
 
@@ -90,6 +92,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.background,
   },
 
   content: {
@@ -102,7 +105,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 8,
     marginBottom: 32,
-    color: "#666",
+    color: Colors.secondaryText,
   },
 
   form: {
@@ -116,7 +119,7 @@ const styles = StyleSheet.create({
 
   input: {
     borderWidth: 1,
-    borderColor: "#bbb",
+    borderColor: Colors.inputBorder,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -125,7 +128,7 @@ const styles = StyleSheet.create({
   },
 
   error: {
-    color: "#b00020",
+    color: Colors.error,
     marginBottom: 4,
   },
 });

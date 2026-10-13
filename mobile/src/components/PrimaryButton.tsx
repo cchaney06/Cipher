@@ -1,5 +1,7 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
+import { Colors } from "../constants/Theme";
+
 interface PrimaryButtonProps {
   title: string;
   onPress: () => void;
@@ -27,11 +29,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 10,
-    backgroundColor: "#222",
+    backgroundColor: Colors.primary,
   },
 
   text: {
-    color: "#fff",
+    color: Colors.primaryText,
     fontWeight: "bold",
   },
 

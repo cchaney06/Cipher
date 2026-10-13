@@ -20,6 +20,8 @@ import { Message } from "../../types/Message";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Colors } from "../../constants/Theme";
+
 export default function Chat() {
   const router = useRouter();
 
@@ -123,15 +125,15 @@ export default function Chat() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
 
   header: {
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    backgroundColor: "#fff",
+    borderBottomColor: Colors.border,
+    backgroundColor: Colors.background,
   },
 
   backButton: {
@@ -175,12 +177,12 @@ const styles = StyleSheet.create({
 
   emptyText: {
     fontSize: 15,
-    color: "#666",
+    color: Colors.secondaryText,
     marginTop: 6,
   },
 
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
 });

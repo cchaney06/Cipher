@@ -6,6 +6,8 @@ import { mockCurrentUser } from "../constants/MockCurrentUser";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Colors } from "../constants/Theme";
+
 export default function Settings() {
   const router = useRouter();
 
@@ -66,14 +68,14 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
 
   header: {
     paddingHorizontal: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: Colors.border,
   },
 
   backButton: {
@@ -100,7 +102,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: "#ddd",
+    backgroundColor: Colors.avatar,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -118,7 +120,7 @@ const styles = StyleSheet.create({
 
   section: {
     borderTopWidth: 1,
-    borderTopColor: "#eee",
+    borderTopColor: Colors.border,
     paddingHorizontal: 20,
     paddingVertical: 18,
   },
@@ -126,7 +128,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#666",
+    color: Colors.secondaryText,
     marginBottom: 12,
     textTransform: "uppercase",
   },
@@ -143,12 +145,12 @@ const styles = StyleSheet.create({
 
   rowValue: {
     fontSize: 16,
-    color: "#666",
+    color: Colors.secondaryText,
   },
 
   warningValue: {
     fontSize: 16,
-    color: "#b26a00",
+    color: Colors.warning,
   },
 
   logoutButton: {
@@ -157,12 +159,12 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#c00",
+    borderColor: Colors.danger,
     alignItems: "center",
   },
 
   logoutText: {
-    color: "#c00",
+    color: Colors.danger,
     fontSize: 16,
     fontWeight: "600",
   },

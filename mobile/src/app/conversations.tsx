@@ -15,6 +15,8 @@ import { mockConversations } from "../constants/MockConversations";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Colors } from "../constants/Theme";
+
 export default function Conversations() {
   const router = useRouter();
 
@@ -92,7 +94,7 @@ export default function Conversations() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
 
   title: {
@@ -102,7 +104,7 @@ const styles = StyleSheet.create({
 
   separator: {
     height: 1,
-    backgroundColor: "#eee",
+    backgroundColor: Colors.border,
     marginLeft: 86,
   },
 
@@ -119,7 +121,7 @@ const styles = StyleSheet.create({
 
   emptyText: {
     fontSize: 15,
-    color: "#666",
+    color: Colors.secondaryText,
     marginTop: 8,
     textAlign: "center",
   },
@@ -152,7 +154,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     height: 42,
     borderRadius: 12,
-    backgroundColor: "#f2f2f2",
+    backgroundColor: Colors.surface,
     fontSize: 16,
   },
 });

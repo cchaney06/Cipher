@@ -3,6 +3,8 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Conversation } from "../types/Conversation";
 import { formatConversationTime } from "../utils/formatConversationTime";
 
+import { Colors } from "../constants/Theme";
+
 interface ConversationRowProps {
   conversation: Conversation;
   onPress: () => void;
@@ -84,7 +86,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: "#ddd",
+    backgroundColor: Colors.avatar,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 14,
@@ -120,13 +122,13 @@ const styles = StyleSheet.create({
   preview: {
     flex: 1,
     fontSize: 15,
-    color: "#666",
+    color: Colors.secondaryText,
     marginRight: 10,
   },
 
   time: {
     fontSize: 13,
-    color: "#777",
+    color: Colors.tertiaryText,
   },
 
   unreadText: {
@@ -137,14 +139,14 @@ const styles = StyleSheet.create({
     minWidth: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: "#222",
+    backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 6,
   },
 
   badgeText: {
-    color: "#fff",
+    color: Colors.primaryText,
     fontSize: 12,
     fontWeight: "600",
   },

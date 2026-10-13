@@ -2,6 +2,8 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { Message } from "../types/Message";
 
+import { Colors } from "../constants/Theme";
+
 interface MessageBubbleProps {
   message: Message;
   isMine: boolean;
@@ -50,12 +52,12 @@ const styles = StyleSheet.create({
   },
 
   myBubble: {
-    backgroundColor: "#222",
+    backgroundColor: Colors.primary,
     borderBottomRightRadius: 5,
   },
 
   theirBubble: {
-    backgroundColor: "#e9e9e9",
+    backgroundColor: Colors.surfaceSecondary,
     borderBottomLeftRadius: 5,
   },
 
@@ -65,17 +67,17 @@ const styles = StyleSheet.create({
   },
 
   myMessageText: {
-    color: "#fff",
+    color: Colors.primaryText,
   },
 
   time: {
     fontSize: 11,
-    color: "#777",
+    color: Colors.tertiaryText,
     marginTop: 4,
     alignSelf: "flex-end",
   },
 
   myTime: {
-    color: "#ccc",
+    color: Colors.messageTimeOnPrimary,
   },
 });
