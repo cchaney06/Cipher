@@ -2,11 +2,16 @@
 
 ## Current Prototype
 
-The current application consists of a React Native mobile client running through Expo.
+Cipher currently consists of two separate applications:
 
-Current data is stored as mock TypeScript objects.
+- React Native mobile client running through Expo
+- Node.js/TypeScript HTTP API using Express
+
+The mobile client still uses local mock data and is not yet connected to the API.
 
 ```text
+Mobile Client
+
 Mock Data
    |
    v
@@ -14,6 +19,17 @@ React Native
    |
    v
 Cipher UI
+
+
+Backend
+
+HTTP Request
+   |
+   v
+Express API
+   |
+   v
+JSON Response
 ```
 
 Planned Architecture:
@@ -41,3 +57,5 @@ The server will eventually handle:
 ```
 
 Message encryption and decryption will occur on client devices rather than on the server.
+
+---

@@ -44,10 +44,14 @@ Not yet implemented:
 
 ### Backend
 
-Planned:
+Current:
 
 - Node.js
 - TypeScript
+- Express
+
+Planned:
+
 - PostgreSQL
 - WebSockets
 
