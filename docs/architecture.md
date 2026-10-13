@@ -19,17 +19,32 @@ React Native
    |
    v
 Cipher UI
+```
 
+### Current Backend
 
-Backend
+The Cipher backend currently uses Node.js, TypeScript, and Express.
 
-HTTP Request
+Implemented endpoints:
+
+- `GET /`
+- `GET /health`
+- `GET /api/users`
+- `GET /api/users/:id`
+- `POST /api/users`
+
+User information is currently stored in memory for development.
+PostgreSQL persistence has not yet been implemented.
+
+```text
+Client
    |
+   | HTTP
    v
 Express API
    |
    v
-JSON Response
+In-Memory Data
 ```
 
 Planned Architecture:

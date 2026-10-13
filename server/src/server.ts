@@ -1,10 +1,14 @@
 import express from "express";
 
+import { usersRouter } from "./routes/users.js";
+
 const app = express();
 
 const PORT = 3000;
 
 app.use(express.json());
+
+app.use("/api/users", usersRouter);
 
 app.get("/", (_request, response) => {
     response.status(200).json({

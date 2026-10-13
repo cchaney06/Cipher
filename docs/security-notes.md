@@ -23,3 +23,6 @@ end-to-end encryption.
 - No backend exists yet
 - No cryptographic protocol has been integrated
 - No security audit has been performed
+- User creation currently uses in-memory mock data
+- User authentication has not been implemented
+- Passwords are not yet accepted or stored by the backend
