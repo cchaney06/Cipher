@@ -71,36 +71,34 @@ usersRouter.post("/", async (request, response) => {
 
     const normalizedUsername = username.trim().toLowerCase();
 
+    if (
+        normalizedUsername.length < 3 ||
+        normalizedUsername.length > 32
+    ) {
+        return response.status(400).json({
+            error: "Username must be between 3 and 32 characters.",
+        });
+    }
+
     try {
-        const existingUser = await pool.query<User>(
+        const result = await pool.query<User>(
            `
-            SELECT
+            INSERT INTO users (username)
+            VALUES ($1)
+            ON CONFLICT (username) DO NOTHING
+            RETURNING
                 id,
                 username,
                 created_at AS "createdAt"
-            FROM users
-            WHERE username = $1
             `,
             [normalizedUsername]
         );
 
-        if (existingUser.rows.length > 0) {
+        if (result.rows.length === 0) {
             return response.status(409).json({
                 error: "Username already exists.",
             });
         }
-
-        const result = await pool.query<User>(
-            `
-                INSERT INTO users (username)
-                VALUES ($1)
-                RETURNING
-                    id, 
-                    username, 
-                    created_at AS "createdAt"
-            `,
-            [normalizedUsername]
-        );
 
         return response.status(201).json(
             result.rows[0]
