@@ -1,137 +1,250 @@
-# Cipher
+# Cipher Mobile
 
-Cipher is an end-to-end encrypted messaging application currently
-under development.
+The Cipher mobile client is a React Native application built with Expo, Expo Router, and TypeScript.
 
-The project is being built as a native-style mobile application using
-React Native and Expo, with a Node.js/TypeScript backend and PostgreSQL database for account and messaging services.
+It currently provides the user interface for Cipher and can communicate with the local Cipher backend API during development.
 
 ## Current Status
-
-Cipher is currently in the early full-stack prototype stage.
 
 Implemented:
 
 - Login interface
+- Login form validation
 - Conversation list
 - Conversation searching
 - Dynamic chat routes
 - Incoming and outgoing message bubbles
 - Local message sending
+- Automatic chat scrolling
 - Settings/profile screen
 - Logout navigation
 - Safe-area handling
+- Keyboard handling
 - Basic accessibility support
-- Node.js/TypeScript Express backend
-- Backend health endpoint
-- Database-aware health checks
-- User API endpoints
-- Basic API request validation
-- Local PostgreSQL development database
-- Persistent users table
-- Docker-based database environment
-- Express-to-PostgreSQL integration
-- Reusable PostgreSQL connection pool
-- Persistent database-backend user retrieval
-- Persistent database-backend user creation
-- Parameterized SQL queries for user-supplied values
-- Mobile-to-backend API connectivity
-- Reusable React Native API service
-- Backend connectivity status in the mobile client
-- Database-backed user data retrieval from the mobile client
-- Persistent conversations table
-- Conversation membership table
-- Persistent messages table
-- Database foreign-key relationships
-- Conversation and message lookup indexes
-- Database-level message validation
+- Reusable API service
+- Backend health checks
+- Database-backed user count retrieval
+- Physical iPhone development through Expo Go
+
+Still using local mock data:
+
+- Authentication
+- Current user
+- Conversations
+- Messages
 
 Not yet implemented:
 
-- Real user authentication
-- Conversation API endpoints
-- Message API endpoints
-- Backend-driven conversations in the mobile client
-- Backend-driven messages in the mobile client
-- Real-time networking
+- Real authentication
+- Backend-driven conversation data
+- Backend-driven message data
+- Real-time messaging
 - End-to-end encryption
 - Push notifications
 
 ## Technology Stack
-
-### Mobile
 
 - React Native
 - Expo
 - Expo Router
 - TypeScript
 
-### Backend
-
-- Node.js
-- TypeScript
-- Express
-- node-postgres
-
-### Database
-
-- PostgreSQL
-- Docker
-
-### Planned
-
-- WebSockets
-- End-to-end encryption
-- Push notifications
-
 ## Project Structure
 
 ```text
-cipher/
-├── mobile/
-├── server/
-├── database/
-└── docs/
+mobile/
+├── src/
+│   ├── app/
+│   │   ├── chat/
+│   │   │   └── [id].tsx
+│   │   ├── _layout.tsx
+│   │   ├── conversations.tsx
+│   │   ├── index.tsx
+│   │   └── settings.tsx
+│   │
+│   ├── components/
+│   │   ├── AppTitle.tsx
+│   │   ├── ConversationRow.tsx
+│   │   ├── MessageBubble.tsx
+│   │   ├── MessageInput.tsx
+│   │   └── PrimaryButton.tsx
+│   │
+│   ├── constants/
+│   │   ├── AppConfig.ts
+│   │   ├── MockConversations.ts
+│   │   ├── MockCurrentUser.ts
+│   │   ├── MockMessages.ts
+│   │   └── Theme.ts
+│   │
+│   ├── services/
+│   │   └── api.ts
+│   │
+│   ├── types/
+│   │   ├── Conversation.ts
+│   │   ├── Message.ts
+│   │   └── User.ts
+│   │
+│   └── utils/
+│       └── formatConversationTime.ts
+│
+├── .env.example
+├── package.json
+└── tsconfig.json
 ```
 
-## Development Milestones
+## Development Setup
 
-### September 2026
+Install dependencies:
 
-- Set up Expo/React Native development environment
-- Ran Cipher on a physical iPhone from Windows
-- Built login UI
-- Built conversation inbox
-- Added dynamic chat routing
-- Built local messaging interface
-- Added settings/profile screen
-- Added conversation search
-- Improved safe-area and keyboard handling
-- Created Node.js/TypeScript backend
-- Added Express API routes
-- Added user creation and retrieval endpoints
-- Added request validation
-- Created PostgreSQL development database
-- Created persistent users table
-- Added Docker-based database persistence
-- Connected the Express backend to PostgreSQL
-- Replaced temporary in-memory user storage with database queries
-- Added a reusable PostgreSQL connection pool
-- Added database-aware backend health checks
-- Added parameterized SQL queries for user operations
-- Connected the React Native mobile client to the Express API
-- Added a reusable mobile API service
-- Added live backend connectivity status to the Settings screen
-- Added database-backed user count retrieval from the mobile client
-- Verified full-stack communication from the physical iPhone through the API to PostgreSQL
-- Added persistent conversation storage
-- Added many-to-many conversation membership
-- Added persistent message storage
-- Added foreign-key relationships between users, conversations, memberships, and messages
-- Added indexes for common conversation and message queries
-- Added database-level validation for message content
-- Created and queried a persistent test conversation and messages in PostgreSQL
+```powershell
+npm install
+```
 
-### Next
+Type-check the project:
 
-- Build PostgreSQL-backed conversation and message API endpoints, including conversation retrieval, message retrieval, message creation, and conversation membership validation. After those endpoints are working, begin replacing the mobile client's local conversation and message mock data with backend API data.
+```powershell
+npx tsc --noEmit
+```
+
+Check the Expo project:
+
+```powershell
+npx expo-doctor@latest
+```
+
+Start the Expo development server:
+
+```powershell
+npx expo start --clear
+```
+
+The project is currently tested primarily on a physical iPhone using Expo Go.
+
+## Backend Configuration
+
+The mobile client reads the backend API address from:
+
+```text
+.env.local
+```
+
+Create the file in the `mobile` directory and add:
+
+```text
+EXPO_PUBLIC_API_URL=http://YOUR_COMPUTER_IP:3000
+```
+
+For example:
+
+```text
+EXPO_PUBLIC_API_URL=http://192.168.x.x:3000
+```
+
+Do not commit `.env.local`.
+
+The repository includes `.env.example` to document the required environment variable.
+
+The API URL is not a secret. Values beginning with `EXPO_PUBLIC_` are available to the mobile application at runtime and should never contain passwords, private keys, API secrets, or other sensitive credentials.
+
+## Local Network Development
+
+During local development, the physical iPhone connects to the Windows development machine over a Windows mobile hotspot.
+
+The Express backend must be running and accessible from the iPhone before API requests from Cipher will work.
+
+The backend currently listens on port:
+
+```text
+3000
+```
+
+A successful backend health response should resemble:
+
+```json
+{
+  "status": "ok",
+  "service": "cipher-api",
+  "database": "connected"
+}
+```
+
+## API Service
+
+Backend requests are centralized in:
+
+```text
+src/services/api.ts
+```
+
+The service currently supports:
+
+- Backend health checks
+- Retrieving database-backed users
+
+The Settings screen uses these requests to display:
+
+- Backend connection status
+- Number of users currently stored in PostgreSQL
+
+## Current Data Flow
+
+```text
+                  React Native
+                    /      \
+                   /        \
+                  v          v
+         Local Mock Data   API Service
+              |                |
+              v                v
+     Conversations /       Express API
+        Messages                |
+                                v
+                            PostgreSQL
+```
+
+The mobile client currently uses real backend data only for connectivity and user information.
+
+Conversation and message screens still use local mock data.
+
+## Security Status
+
+Cipher does not currently provide end-to-end encryption.
+
+Current development limitations include:
+
+- Login is simulated
+- No real user authentication
+- Conversation and message data are local mock data
+- Local API communication uses HTTP during development
+- Real-time networking has not been implemented
+- Message encryption has not been implemented
+
+Production communication is planned to use HTTPS.
+
+End-to-end encryption will be implemented separately after the core client/server messaging architecture is functioning.
+
+## Development Notes
+
+If the backend URL changes, update:
+
+```text
+.env.local
+```
+
+and restart Expo:
+
+```powershell
+npx expo start --clear
+```
+
+If the iPhone cannot reach the backend, verify:
+
+- The backend server is running
+- PostgreSQL is running
+- The iPhone is connected to the development hotspot
+- The API address in `.env.local` matches the Windows hotspot IPv4 address
+- Port `3000` is reachable from the iPhone
+
+## Next Steps
+
+The next major mobile milestone is to replace local conversation and message mock data with PostgreSQL-backed API data once the corresponding backend endpoints are implemented.
