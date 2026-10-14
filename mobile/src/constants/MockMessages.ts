@@ -6,7 +6,7 @@ export const mockMessages: Record<string, Message[]> = {
   "1": [
     {
       id: "1",
-      senderId: "ryan",
+      senderId: "sam",
       content: "Hey! Are you free later?",
       createdAt: "2026-09-17T10:15:00-05:00",
     },
@@ -18,7 +18,7 @@ export const mockMessages: Record<string, Message[]> = {
     },
     {
       id: "3",
-      senderId: "ryan",
+      senderId: "sam",
       content: "Want to grab something to eat?",
       createdAt: "2026-09-17T10:18:00-05:00",
     },
