@@ -39,12 +39,20 @@ Implemented:
 - Reusable React Native API service
 - Backend connectivity status in the mobile client
 - Database-backed user data retrieval from the mobile client
+- Persistent conversations table
+- Conversation membership table
+- Persistent messages table
+- Database foreign-key relationships
+- Conversation and message lookup indexes
+- Database-level message validation
 
 Not yet implemented:
 
 - Real user authentication
-- Backend-driven conversations
-- Backend-driven messages
+- Conversation API endpoints
+- Message API endpoints
+- Backend-driven conversations in the mobile client
+- Backend-driven messages in the mobile client
 - Real-time networking
 - End-to-end encryption
 - Push notifications
@@ -116,7 +124,14 @@ cipher/
 - Added live backend connectivity status to the Settings screen
 - Added database-backed user count retrieval from the mobile client
 - Verified full-stack communication from the physical iPhone through the API to PostgreSQL
+- Added persistent conversation storage
+- Added many-to-many conversation membership
+- Added persistent message storage
+- Added foreign-key relationships between users, conversations, memberships, and messages
+- Added indexes for common conversation and message queries
+- Added database-level validation for message content
+- Created and queried a persistent test conversation and messages in PostgreSQL
 
 ### Next
 
-- Expand the database schema to support conversations, conversation membership, and messages. Then begin replacing the mobile client's local conversation and message mock data with backend API data.
+- Build PostgreSQL-backed conversation and message API endpoints, including conversation retrieval, message retrieval, message creation, and conversation membership validation. After those endpoints are working, begin replacing the mobile client's local conversation and message mock data with backend API data.

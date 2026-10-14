@@ -19,9 +19,11 @@ Cipher is currently a prototype and does not yet provide end-to-end encryption.
 
 - Authentication is simulated
 - Conversations and messages are still local mock data in the mobile client
+- Conversation and message API endpoints have not yet been implemented
 - User authentication has not been implemented
 - Authorization has not been implemented
 - Passwords are not yet accepted or stored by the backend
+- Development message records currently store plaintext message content in PostgreSQL
 - No cryptographic protocol has been integrated
 - End-to-end encryption has not yet been implemented
 - Real-time messaging has not yet been implemented
@@ -30,7 +32,7 @@ Cipher is currently a prototype and does not yet provide end-to-end encryption.
 
 ## Backend Security
 
-The backend currently uses Node.js, TypeScript, Express, and PostgreSQL.
+The backend currently uses Node.js, TypeScript, Express, node-postgres, and PostgreSQL.
 
 Current protections include:
 
@@ -67,16 +69,38 @@ The current development database runs locally using PostgreSQL inside Docker.
 
 Current database protections include:
 
-- PostgreSQL credentials are stored in ignored `.env` files
+- PostgreSQL credentials are stored in ignored .env files
 - Credentials are not committed to Git
 - User IDs use UUIDs
+- Conversation IDs use UUIDs
+- Message IDs use UUIDs
 - Usernames are unique
 - Usernames are constrained to lowercase values
 - Username length is constrained at the database level
-- User data is persisted in a Docker volume
+- Conversation membership uses foreign-key relationships
+- Duplicate membership in the same conversation is rejected
+- Messages must reference an existing conversation
+- Messages must reference an existing user
+- Empty and whitespace-only messages are rejected by the database
+- Message length is limited at the database level
+- User, conversation, membership, and message data are persisted in a Docker volume
 - No plaintext passwords are stored
 
 The current database configuration is intended for local development and should not be treated as a production security configuration.
+
+## Development Message Storage
+
+The current PostgreSQL messages table contains a plaintext content field for development purposes.
+
+This is not the intended production security design.
+
+The current schema allows the backend and database to read stored development message content.
+
+Before Cipher can provide end-to-end encryption, message content must be encrypted on client devices before being transmitted to the backend.
+
+The long-term goal is for the backend and PostgreSQL database to store encrypted message payloads rather than plaintext message contents.
+
+The current database also does not independently guarantee that a message sender belongs to the referenced conversation. Conversation membership will be validated by the backend before message creation, with stronger database-level enforcement considered later if needed.
 
 ## Password Security
 
