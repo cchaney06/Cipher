@@ -1,7 +1,7 @@
 # Cipher
 
-Cipher is an end-to-end encrypted messaging application currently
-under development.
+Cipher is a secure messaging application currently
+under development, with end-to-end encryption planned as a core feature.
 
 The project is being built as a native-style mobile application using
 React Native and Expo, with a Node.js/TypeScript backend and PostgreSQL database for account and messaging services.
@@ -32,8 +32,8 @@ Implemented:
 - Docker-based database environment
 - Express-to-PostgreSQL integration
 - Reusable PostgreSQL connection pool
-- Persistent database-backend user retrieval
-- Persistent database-backend user creation
+- Persistent database-backed user retrieval
+- Persistent database-backed user creation
 - Parameterized SQL queries for user-supplied values
 - Mobile-to-backend API connectivity
 - Reusable React Native API service
