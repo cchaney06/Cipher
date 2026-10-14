@@ -26,7 +26,7 @@ export function formatConversationTime(dateString: string): string {
     return date.toLocaleDateString([], { weekday: "short" });
   }
 
-  return date.toLocaleTimeString([], {
+  return date.toLocaleDateString([], {
     month: "numeric",
     day: "numeric",
     year: "2-digit",
