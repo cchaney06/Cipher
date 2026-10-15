@@ -26,31 +26,36 @@ Implemented:
 - Backend health endpoint
 - Database-aware health checks
 - User API endpoints
+- Conversation API endpoints
+- Message API endpoints
+- Conversation retrieval through PostgreSQL
+- Message retrieval through PostgreSQL
+- Persistent message creation through the API
+- Conversation membership validation
 - Basic API request validation
+- API rate limiting
 - Local PostgreSQL development database
 - Persistent users table
+- Persistent conversations table
+- Conversation membership table
+- Persistent messages table
 - Docker-based database environment
 - Express-to-PostgreSQL integration
 - Reusable PostgreSQL connection pool
 - Persistent database-backed user retrieval
 - Persistent database-backed user creation
 - Parameterized SQL queries for user-supplied values
+- Database foreign-key relationships
+- Conversation and message lookup indexes
+- Database-level message validation
 - Mobile-to-backend API connectivity
 - Reusable React Native API service
 - Backend connectivity status in the mobile client
 - Database-backed user data retrieval from the mobile client
-- Persistent conversations table
-- Conversation membership table
-- Persistent messages table
-- Database foreign-key relationships
-- Conversation and message lookup indexes
-- Database-level message validation
 
 Not yet implemented:
 
 - Real user authentication
-- Conversation API endpoints
-- Message API endpoints
 - Backend-driven conversations in the mobile client
 - Backend-driven messages in the mobile client
 - Real-time networking
@@ -72,6 +77,7 @@ Not yet implemented:
 - TypeScript
 - Express
 - node-postgres
+- express-rate-limit
 
 ### Database
 
@@ -132,6 +138,22 @@ cipher/
 - Added database-level validation for message content
 - Created and queried a persistent test conversation and messages in PostgreSQL
 
+### October 2026
+
+- Added API rate limiting to backend user and conversation routes
+- Added PostgreSQL-backed conversation retrieval
+- Added PostgreSQL-backed message retrieval
+- Added persistent message creation through the Express API
+- Added conversation membership validation for message rerieval
+- Added conversation membership validation for message creation
+- Added conversation summaries containing members and the latest message
+- Added API validation for message sender IDs and message content
+- Verified persistent message creation through the Express API
+- Enabled repository security scanning and dependency monitoring
+
 ### Next
 
-- Build PostgreSQL-backed conversation and message API endpoints, including conversation retrieval, message retrieval, message creation, and conversation membership validation. After those endpoints are working, begin replacing the mobile client's local conversation and message mock data with backend API data.
+- Replace the mobile client's local conversation mock data with PostgreSQL-backed conversation data
+- Replace the mobile client's local message mock data with PostgreSQL-backed message data
+- Send messages from the mobile client through the Express API
+- Begin implementing real user authentication

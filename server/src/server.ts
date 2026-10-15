@@ -3,8 +3,9 @@ import "dotenv/config";
 import express from "express";
 import { rateLimit } from "express-rate-limit";
 
-import { checkDatabaseConnection } from "./db/index.js";
-import { usersRouter } from "./routes/users.js";
+import { checkDatabaseConnection, } from "./db/index.js";
+import { conversationsRouter, } from "./routes/conversations.js";
+import { usersRouter, } from "./routes/users.js";
 
 const app = express();
 
@@ -50,6 +51,8 @@ app.get("/health", async (_request, response) => {
 });
 
 app.use("/api/users", apiLimiter, usersRouter);
+
+app.use("/api/conversations", apiLimiter, conversationsRouter);
 
 app.listen(PORT, HOST, () => {
     console.log(`Cipher API running at http://localhost:${PORT}`);

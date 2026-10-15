@@ -19,9 +19,8 @@ Cipher is currently a prototype and does not yet provide end-to-end encryption.
 
 - Authentication is simulated
 - Conversations and messages are still local mock data in the mobile client
-- Conversation and message API endpoints have not yet been implemented
 - User authentication has not been implemented
-- Authorization has not been implemented
+- Secure user authorization has not been implemented
 - Passwords are not yet accepted or stored by the backend
 - Development message records currently store plaintext message content in PostgreSQL
 - No cryptographic protocol has been integrated
@@ -30,21 +29,68 @@ Cipher is currently a prototype and does not yet provide end-to-end encryption.
 - Local mobile-to-backend development traffic currently uses HTTP rather than HTTPS
 - No security audit has been performed
 
+Conversation and message API endpoints now exist, but the mobile client has not yet been migrated to use them.
+
 ## Backend Security
 
-The backend currently uses Node.js, TypeScript, Express, node-postgres, and PostgreSQL.
+The backend currently uses Node.js, TypeScript, Express, node-postgres, express-rate-limit, and PostgreSQL.
 
 Current protections include:
 
-- Database credentials are loaded from an ignored server .env file
+- Database credentials are loaded from an ignored server `.env` file
 - Database credentials are not stored directly in source code
 - User-supplied values are passed to PostgreSQL using parameterized SQL queries
 - API input is validated before user records are created
+- Message input is validated before message records are created
 - Duplicate usernames are rejected
+- Conversation existence is checked before message operations
+- Conversation membership is checked before message retrieval
+- Conversation membership is checked before message creation
+- User and conversation API routes are rate limited
 - Database errors are handled without intentionally exposing database credentials to clients
 - Backend health checks verify database connectivity
 
-The backend does not currently implement user authentication, authorization, session management, or password handling.
+The backend does not currently implement user authentication, secure authorization, session management, or password handling.
+
+### Rate Limiting
+
+Cipher currently uses `express-rate-limit` to limit repeated requests to API route groups.
+
+The current development limiter allows a limited number of requests from a client IP during a configured time window.
+
+When the limit is exceeded, the server returns HTTP `429 Too Many Requests`.
+
+Rate limiting helps reduce unrestricted repeated requests but should not be considered a replacement for authentication, authorization, or broader denial-of-service protection.
+
+The current in-memory limiter is appropriate for the single-instance development backend.
+
+A production deployment with multiple backend instances would require a shared rate-limit store or equivalent infrastructure.
+
+## Conversation Membership Validation
+
+Conversation and message endpoints now check whether a provided user ID belongs to the requested conversation before messages are returned or created.
+
+For message retrieval:
+
+1. The backend verifies that the conversation exists.
+2. The backend verifies that the supplied user ID belongs to the conversation.
+3. Messages are returned only if both checks succeed.
+
+For message creation:
+
+1. The backend verifies that the conversation exists.
+2. The backend verifies that the supplied sender ID belongs to the conversation.
+3. The message is created only if both checks succeed.
+
+A missing conversation returns `404 Not Found`.
+
+A user or sender who is not a member of the conversation receives `403 Forbidden`.
+
+This is currently prototype membership validation, not secure user authorization.
+
+Because Cipher does not yet authenticate callers, a client can currently supply a user ID or sender ID directly. The backend cannot yet prove that the caller actually owns that identity.
+
+Real authorization will be added after authentication is implemented.
 
 ## Mobile-to-Backend Security
 
@@ -55,9 +101,9 @@ Current development behavior:
 - The physical iPhone connects to the backend over a Windows mobile hotspot
 - The development API uses a local network IP address
 - Development API traffic currently uses HTTP
-- The API base URL is configured through an Expo EXPO*PUBLIC* environment variable
+- The API base URL is configured through an Expo `EXPO_PUBLIC_` environment variable
 - No secrets are stored in the mobile API URL configuration
-- Conversation and message data are still local mock data
+- Conversation and message screens still use local mock data
 
 The current local networking setup is intended only for development and should not be treated as production transport security.
 
@@ -90,7 +136,7 @@ The current database configuration is intended for local development and should 
 
 ## Development Message Storage
 
-The current PostgreSQL messages table contains a plaintext content field for development purposes.
+The current PostgreSQL messages table contains a plaintext `content` field for development purposes.
 
 This is not the intended production security design.
 
@@ -100,7 +146,11 @@ Before Cipher can provide end-to-end encryption, message content must be encrypt
 
 The long-term goal is for the backend and PostgreSQL database to store encrypted message payloads rather than plaintext message contents.
 
-The current database also does not independently guarantee that a message sender belongs to the referenced conversation. Conversation membership will be validated by the backend before message creation, with stronger database-level enforcement considered later if needed.
+The database does not independently guarantee that a message sender belongs to the referenced conversation.
+
+The Express API now performs conversation membership validation before message retrieval and message creation.
+
+Stronger database-level enforcement may be considered later if needed.
 
 ## Password Security
 
