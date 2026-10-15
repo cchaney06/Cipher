@@ -1,23 +1,31 @@
 import "dotenv/config";
 
 import express from "express";
+import { rateLimit } from "express-rate-limit";
 
 import { checkDatabaseConnection } from "./db/index.js";
 import { usersRouter } from "./routes/users.js";
 
 const app = express();
 
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 100,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: {
+        error: "Too many requests. Please try again later.",
+    },
+});
+
 const PORT = Number(process.env.PORT ?? 3000);
 const HOST = process.env.HOST ?? "0.0.0.0";
 
 app.use(express.json());
 
-app.use("/api/users", usersRouter);
-
 app.get("/", (_request, response) => {
     response.status(200).json({
-        name: "Cipher API",
-        version: "0.1.0",
+        message: "Cipher API is running",
     });
 });
 
@@ -40,6 +48,8 @@ app.get("/health", async (_request, response) => {
         });
     }
 });
+
+app.use("/api/users", apiLimiter, usersRouter);
 
 app.listen(PORT, HOST, () => {
     console.log(`Cipher API running at http://localhost:${PORT}`);
