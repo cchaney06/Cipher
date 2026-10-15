@@ -1,0 +1,61 @@
+name: Feature request
+description: Suggest a new feature or improvement for Cipher
+title: "[Feature]: "
+labels:
+  - enhancement
+body: 
+  - type: markdown
+    attributes: 
+      value: |
+        Thanks for suggesting an improvement to Cipher!
+
+  - type: textarea
+    id: problem
+    attributes: 
+      label: Problem or need
+      description: What problem would this feature solve?
+      placeholder: Describe the problem or limitation. 
+    validations: 
+      required: true
+
+  - type: textarea
+    id: feature
+    attributes: 
+      label: Proposed feature
+      description: What would you like Cipher to do?
+      placeholder: Describe the feature you would like to see.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes: 
+      label: Area
+      description: Which part of Cipher would this affect?
+      options: 
+        - Mobile app
+        - Backend API
+        - Database
+        - Security
+        - Authentication
+        - Messaging
+        - Documentation
+        - Other
+    validations: 
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes: 
+      label: Alternatives considered
+      description: Are there other approaches or workarounds?
+    validations: 
+      required: false
+
+  - type: textarea
+    id: additional 
+    attributes: 
+      label: Additional context
+      description: Add mockups, examples, or other useful context.
+    validations: 
+      required: false
