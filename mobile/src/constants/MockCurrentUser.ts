@@ -2,5 +2,5 @@ import { User } from "../types/User";
 
 export const mockCurrentUser: User = {
   id: "current-user",
-  username: "john",
+  username: "alex",
 };

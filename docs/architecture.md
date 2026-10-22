@@ -1,106 +1,112 @@
 # Cipher Architecture
 
-## Current Prototype
+## Overview
 
-Cipher currently consists of two application components and a database service:
+Cipher is a full-stack secure messaging application prototype built with:
 
-- React Native mobile client running through Expo
-- Node.js/TypeScript HTTP API using Express
-- PostgreSQL development database running through Docker
+- React Native and Expo for the mobile client
+- Node.js, TypeScript, and Express for the backend API
+- PostgreSQL for persistent application data
+- Docker for the local database environment
 
-The mobile client is connected to the backend API for backend health information and database-backend user data.
+The mobile client communicates with the Express API, which handles validation, conversation membership checks, and PostgreSQL queries.
 
-Conversation and message data still use local mock data in the mobile application.
+```text
+iPhone
+  |
+  | HTTP during local development
+  v
+React Native
+  |
+  v
+API Service
+  |
+  v
+Express API
+  |
+  | Parameterized SQL
+  v
+PostgreSQL
+```
 
-The Express backend is connected to PostgreSQL and currently exposes database-backed operations for:
-
-- Users
-- Conversations
-- Messages
-- Conversation membership validation
-
-PostgreSQL contains persistent tables for users, conversations, conversation membership, and messages.
+Authentication and end-to-end encryption are not yet implemented.
 
 ## Mobile Client
 
-The React Native client currently uses both local mock data and real backend API requests.
+The React Native client uses Expo Router and TypeScript.
 
-```text
-                  React Native
-                    /      \
-                   /        \
-                  v          v
-         Local Mock Data   API Service
-              |                |
-              v                v
-     Conversations /       Express API
-        Messages
-```
+The mobile application currently supports:
 
-Local mock data is still used for:
+- Simulated login
+- Conversation retrieval from the backend
+- Conversation searching
+- Dynamic chat routes
+- Message retrieval from the backend
+- Persistent message creation through the backend
+- Settings and backend-status information
+- Safe-area handling
+- Basic accessibility support
 
-- Conversations
-- Messages
-- Simulated current-user information
-- Simulated login behavior
-
-The backend API is currently used for:
-
-- Server health status
-- Database connectivity status
-- Retrieving database-backed user information
-
-The mobile API service is located in:
+The mobile API service is located at:
 
 ```text
 mobile/src/services/api.ts
 ```
 
-During local development, the physical iPhone connects to the backend over a Windows mobile hotspot using the Lenovo's local network address.
+The current user identity is still simulated during development. The application resolves the simulated username to a real PostgreSQL user ID before retrieving conversations or messages.
 
-The backend now supports conversation and message operations, but the mobile conversation and chat screens have not yet been migrated from mock data to those endpoints.
+Real authentication will eventually replace this behavior.
 
-## Current Backend
+## Backend API
 
-The Cipher backend currently uses Node.js, TypeScript, Express, node-postgres, and express-rate-limit.
+The backend uses:
 
-Implemented endpoints:
+- Node.js
+- TypeScript
+- Express
+- node-postgres
+- express-rate-limit
 
-- `GET /`
-- `GET /health`
-- `GET /api/users`
-- `GET /api/users/:id`
-- `POST /api/users`
-- `GET /api/users/:userId/conversations`
-- `GET /api/conversations/:conversationId/messages`
-- `POST /api/conversations/:conversationId/messages`
+Implemented endpoints include:
 
-The Express API retrieves and creates users through PostgreSQL.
+```text
+GET  /
+GET  /health
 
-The backend can also:
+GET  /api/users
+GET  /api/users/:id
+POST /api/users
 
-- Retrieve conversations belonging to a user
-- Retrieve members of a conversation
-- Retrieve the most recent message for a conversation
-- Retrieve conversation messages in chronological order
-- Create persistent messages
-- Verify conversation membership before returning messages
-- Verify conversation membership before allowing message creation
+GET  /api/users/:userId/conversations
 
-Database communication is handled by a reusable node-postgres connection pool.
+GET  /api/conversations/:conversationId/messages
+POST /api/conversations/:conversationId/messages
+```
 
-User, conversation, membership, and message data are persisted in PostgreSQL.
+The backend handles:
 
-The `/health` endpoint also checks whether the API can successfully communicate with PostgreSQL.
+- User retrieval and creation
+- Conversation retrieval
+- Conversation-member retrieval
+- Latest-message retrieval
+- Chronological message retrieval
+- Persistent message creation
+- Conversation membership validation
+- Input validation
+- Request rate limiting
+- Database health checks
+
+Database communication is handled through a reusable node-postgres connection pool.
 
 ```text
 HTTP Request
     |
     v
-Express API
+Express
     |
-    | Validation
-    | Membership Checks
+    | Input validation
+    | Membership validation
+    | Rate limiting
     | Parameterized SQL
     v
 PostgreSQL
@@ -109,11 +115,7 @@ PostgreSQL
 JSON Response
 ```
 
-User and conversation API route groups are protected by request rate limiting.
-
-The health endpoint is not currently rate limited.
-
-## Conversation Retrieval
+## Conversation and Message Flow
 
 A user's conversations are retrieved through:
 
@@ -121,18 +123,12 @@ A user's conversations are retrieved through:
 GET /api/users/:userId/conversations
 ```
 
-Conversation summaries currently include:
+Each conversation summary can include:
 
 - Conversation ID
-- Conversation creation timestamp
-- Conversation members
-- Most recent message, if one exists
-
-The backend retrieves the requested user's memberships and then retrieves all members associated with each matching conversation.
-
-The most recent message is retrieved for each conversation so the API can eventually support the mobile conversation list.
-
-## Message Retrieval
+- Creation timestamp
+- Members
+- Most recent message
 
 Messages are retrieved through:
 
@@ -140,100 +136,91 @@ Messages are retrieved through:
 GET /api/conversations/:conversationId/messages?userId=<userId>
 ```
 
-Before returning messages, the backend checks:
+Before returning messages, the backend verifies that:
 
-- Whether the conversation exists
-- Whether the provided user ID belongs to the conversation
+1. The conversation exists.
+2. The supplied user belongs to the conversation.
 
-If the conversation does not exist, the API returns a 404 Not Found response.
-
-If the conversation exists but the supplied user is not a member, the API returns a 403 Forbidden response.
-
-Messages are returned in chronological order.
-
-## Message Creation
-
-Messages are created through:
+Message creation uses:
 
 ```text
 POST /api/conversations/:conversationId/messages
 ```
 
-The request currently contains:
+with a request body containing:
 
-```JSON
+```json
 {
-    "senderId": "user-uuid",
-    "content": "Message content"
+  "senderId": "user-uuid",
+  "content": "Message content"
 }
 ```
 
-Before creating a message, the backend validates:
+Before inserting a message, the backend verifies:
 
 - A sender ID is provided
-- Message content is a string
-- Message content is not blank
-- Message content does not exceed the current 2000-character limit
+- Message content is valid
 - The conversation exists
 - The sender belongs to the conversation
 
-Valid messages are persisted in PostgreSQL and returned to the caller.
+Valid messages are stored in PostgreSQL and returned to the mobile client.
 
-This membership validation is not yet secure authorization because Cipher does not currently authenticate the caller. The server cannot yet prove that the caller actually owns the supplied user ID.
+These membership checks are not yet secure authorization because Cipher does not authenticate callers. A client can currently provide a user ID directly.
 
-### Current Database
+## Database
 
-Cipher uses a local PostgreSQL 18 development database running inside Docker.
+Cipher uses PostgreSQL 18 running locally through Docker.
 
-The database currently contains:
+The database contains four primary tables:
 
-- users
-- conversations
-- conversation_members
-- messages
+```text
+users
+conversations
+conversation_members
+messages
+```
 
-#### Users
+### users
 
-The users table contains:
+Stores:
 
 - UUID primary key
 - Unique lowercase username
 - Creation timestamp
 - Username validation constraints
 
-#### Conversations
+### conversations
 
-The conversations table contains:
+Stores:
 
 - UUID primary key
 - Creation timestamp
 
-#### Conversation Membership
+### conversation_members
 
-The conversation_members table creates a many-to-many relationship between users and conversations.
+Creates the many-to-many relationship between users and conversations.
 
-Each membership contains:
+Stores:
 
 - Conversation ID
 - User ID
 - Join timestamp
 
-The combination of conversation ID and user ID forms the table's primary key, preventing the same user from being added to the same conversation more than once.
+The combination of conversation ID and user ID is the primary key, preventing duplicate membership.
 
-#### Messages
+### messages
 
-The messages table contains:
+Stores:
 
 - UUID primary key
 - Conversation ID
 - Sender ID
 - Message content
 - Creation timestamp
-- Message length validation
 
-Messages reference both an existing conversation and an existing user.
+Foreign-key constraints connect messages to existing users and conversations.
 
-Foreign-key constraints maintain relationships between the messaging tables.
+Database constraints also enforce message-content requirements.
 
 Indexes support common lookups for:
 
@@ -243,137 +230,85 @@ Indexes support common lookups for:
 PostgreSQL data is persisted using a Docker volume.
 
 ```text
-             users
-            /     \
-           /       \
-          v         v
-conversation_members messages
-          |             |
-          v             |
-    conversations <-----┘
-          |
-          v
-    Docker Volume
+           users
+          /     \
+         v       v
+conversation_members   messages
+         |                |
+         v                |
+    conversations <-------┘
 ```
-
-## Current System Architecture
-
-```text
-                     Mobile Client
-                     React Native
-                       /       \
-                      /         \
-                     v           v
-           Local Mock Data     API Service
-               |                   |
-               v                   | HTTP
-       Conversations /             v
-          Messages             Express API
-                                  |
-                       ┌──────────┼──────────┐
-                       |          |          |
-                       v          v          v
-                     Users   Conversations Messages
-                                  |
-                                  v
-                         Membership Checks
-                                  |
-                                  | Parameterized SQL
-                                  v
-                              PostgreSQL
-                                  |
-                 ┌────────────────┼────────────────┐
-                 |                |                |
-                 v                v                v
-               users       conversations       messages
-                                  |
-                                  v
-                       conversation_members
-                                  |
-                                  v
-                            Docker Volume
-```
-
-The mobile client can communicate with the Express API over the local development network.
-
-The backend and PostgreSQL database are connected, and the mobile client can retrieve real backend status and database-backed user information.
-
-Conversation and message records are now exposed through the Express API.
-
-However, the React Native conversation and chat screens still use local mock data. Migrating those screens to the backend API is the next development step.
-
-## Planned Architecture
-
-```text
-iPhone
-   |
-   | HTTPS / WebSocket
-   v
-Node.js API
-   |
-   | SQL
-   v
-PostgreSQL
-```
-
-The server will eventually handle:
-
-- Account authentication
-- User lookup
-- Device registration
-- Conversation membership
-- Conversation retrieval
-- Message retrieval
-- Message delivery
-- Offline message queues
-- Public-key distribution
-
-The mobile client will communicate with the backend through HTTPS for standard API requests and WebSockets for real-time messaging.
-
-Conversation and message data will be retrieved and created through the backend instead of local mock data.
 
 ## Development Networking
 
-During local development, the mobile client currently communicates with the Express backend over HTTP through a Windows mobile hotspot.
-
-This local HTTP setup is for development only.
-
-Production communication is planned to use HTTPS.
-
-The PostgreSQL development port is bound to localhost so the database is not intentionally exposed directly to devices on the local network.
-
-The mobile client communicates with Express, and Express communicates with PostgreSQL.
+During local development, the physical iPhone communicates with the Express backend over a Windows mobile hotspot.
 
 ```text
 iPhone
-   |
-   | HTTP development traffic
-   v
+  |
+  | Local HTTP
+  v
 Express API
-   |
-   | localhost database connection
-   v
+  |
+  | localhost:5432
+  v
 PostgreSQL
 ```
 
+PostgreSQL is bound to localhost and is not intentionally exposed directly to devices on the local network.
+
+HTTP is used only for local development.
+
+Production communication is planned to use HTTPS.
+
 ## Security Architecture
 
-Message encryption and decryption will eventually occur on client devices rather than on the server.
+Current backend protections include:
 
-The long-term goal is for the server to handle message delivery without having access to plaintext message contents or users' private messaging keys.
+- Parameterized SQL queries
+- API input validation
+- Conversation membership validation
+- API rate limiting
+- Database credentials stored in ignored environment files
+- PostgreSQL bound to localhost during development
+- Database-level validation and foreign-key constraints
 
-Database queries that include user-supplied values use parameterized SQL queries rather than directly inserting those values into SQL strings.
+Cipher does not yet provide:
 
-Database credentials are loaded from ignored environment files and are not stored directly in source code.
+- Real user authentication
+- Secure authorization
+- End-to-end encryption
+- Production HTTPS
+- Real-time messaging
 
-API route groups use rate limiting to reduce unrestricted repeated requests.
+The current `messages` table stores plaintext message content for development purposes.
 
-Conversation and message operations perform conversation membership checks before returning messages or allowing message creation.
+The long-term design is for message encryption and decryption to occur on client devices so that the backend stores and delivers encrypted payloads without access to plaintext message contents or private messaging keys.
 
-These membership checks are not yet secure authorization because authentication has not been implemented.
+## Planned Architecture
 
-The current PostgreSQL messages table stores plaintext message content for development purposes. This is temporary and is not the intended production security design.
+The long-term system will use:
 
-The current local mobile-to-backend connection uses HTTP for development and does not yet provide production transport security.
+```text
+iPhone
+  |
+  | HTTPS / WebSocket
+  v
+Node.js API
+  |
+  | SQL
+  v
+PostgreSQL
+```
 
-Authentication, secure authorization, and end-to-end encryption have not yet been implemented in the current prototype.
+Planned backend responsibilities include:
+
+- Account authentication
+- Secure authorization
+- Device registration
+- Conversation management
+- Real-time message delivery
+- Offline message queues
+- Public-key distribution
+
+The next major architectural milestone is replacing the simulated current-user identity with real authentication.

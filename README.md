@@ -52,12 +52,12 @@ Implemented:
 - Reusable React Native API service
 - Backend connectivity status in the mobile client
 - Database-backed user data retrieval from the mobile client
+- Backend-driven conversations in the mobile client
+- Backend-driven messages in the mobile client
 
 Not yet implemented:
 
 - Real user authentication
-- Backend-driven conversations in the mobile client
-- Backend-driven messages in the mobile client
 - Real-time networking
 - End-to-end encryption
 - Push notifications
@@ -144,16 +144,21 @@ cipher/
 - Added PostgreSQL-backed conversation retrieval
 - Added PostgreSQL-backed message retrieval
 - Added persistent message creation through the Express API
-- Added conversation membership validation for message rerieval
+- Added conversation membership validation for message retrieval
 - Added conversation membership validation for message creation
 - Added conversation summaries containing members and the latest message
 - Added API validation for message sender IDs and message content
 - Verified persistent message creation through the Express API
 - Enabled repository security scanning and dependency monitoring
+- Replaced local conversation mock data with PostgreSQL-backed API data
+- Replaced local message mock data with PostgreSQL-backed API data
+- Connected mobile message sending to the Express API
+- Verified persistent messages created from a physical iPhone
+- Added conversation refresh when returning from a chat
 
 ### Next
 
-- Replace the mobile client's local conversation mock data with PostgreSQL-backed conversation data
-- Replace the mobile client's local message mock data with PostgreSQL-backed message data
-- Send messages from the mobile client through the Express API
 - Begin implementing real user authentication
+- Replace the simulated current-user identity with authenticated user state
+- Add secure password hashing and session/token handling
+- Continue toward real-time messaging after authentication is established

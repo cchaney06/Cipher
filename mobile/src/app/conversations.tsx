@@ -1,5 +1,5 @@
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 
 import {
   FlatList,
@@ -10,21 +10,115 @@ import {
   View,
 } from "react-native";
 
-import ConversationRow from "../components/ConversationRow";
-import { mockConversations } from "../constants/MockConversations";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import ConversationRow from "../components/ConversationRow";
+
+import { mockCurrentUser } from "../constants/MockCurrentUser";
 import { Colors } from "../constants/Theme";
+
+import {
+  getUserByUsername,
+  getUserConversations,
+  type ApiConversation,
+} from "../services/api";
+
+import type { Conversation } from "../types/Conversation";
+
+function mapApiConversation(
+  conversation: ApiConversation,
+  currentUserId: string,
+): Conversation {
+  const otherMembers = conversation.members.filter(
+    (member) => member.id !== currentUserId,
+  );
+  const conversationName =
+    otherMembers.length > 0
+      ? otherMembers.map((member) => member.username).join(", ")
+      : "Conversation";
+
+  return {
+    id: conversation.id,
+    name: conversationName,
+    lastMessage: conversation.lastMessage?.content ?? "No messages yet",
+    lastMessageAt:
+      conversation.lastMessage?.createdAt ?? conversation.createdAt,
+    unreadCount: 0,
+  };
+}
 
 export default function Conversations() {
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredConversations = mockConversations.filter((conversation) =>
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+
+      async function loadConversations() {
+        setIsLoading(true);
+        setLoadError(null);
+
+        try {
+          const currentUser = await getUserByUsername(mockCurrentUser.username);
+
+          const apiConversations = await getUserConversations(currentUser.id);
+
+          if (cancelled) {
+            return;
+          }
+
+          const mappedConversations = apiConversations.map((conversation) =>
+            mapApiConversation(conversation, currentUser.id),
+          );
+
+          setConversations(mappedConversations);
+        } catch (error) {
+          console.error("Failed to load conversations:", error);
+
+          if (!cancelled) {
+            setConversations([]);
+            setLoadError("Unable to load conversations.");
+          }
+        } finally {
+          if (!cancelled) {
+            setIsLoading(false);
+          }
+        }
+      }
+
+      loadConversations();
+
+      return () => {
+        cancelled = true;
+      };
+    }, []),
+  );
+
+  const filteredConversations = conversations.filter((conversation) =>
     conversation.name.toLowerCase().includes(searchQuery.trim().toLowerCase()),
   );
+
+  let emptyTitle = "No conversations yet";
+  let emptyText = "Your conversations will appear here.";
+
+  if (isLoading) {
+    emptyTitle = "Loading conversations...";
+    emptyText = "Retrieving conversations from Cipher.";
+  } else if (loadError) {
+    emptyTitle = "Unable to load conversations";
+    emptyText = loadError;
+  } else if (searchQuery.trim() !== "") {
+    emptyTitle = "No conversations found";
+    emptyText = "Try searching for a different name.";
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
@@ -65,6 +159,7 @@ export default function Conversations() {
                 pathname: "/chat/[id]",
                 params: {
                   id: item.id,
+                  name: item.name,
                 },
               });
             }}
@@ -73,17 +168,9 @@ export default function Conversations() {
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>
-              {searchQuery.trim() === ""
-                ? "No conversations yet"
-                : "No conversations found"}
-            </Text>
+            <Text style={styles.emptyTitle}>{emptyTitle}</Text>
 
-            <Text style={styles.emptyText}>
-              {searchQuery.trim() === ""
-                ? "Your conversations will appear here."
-                : "Try searching for a different name."}
-            </Text>
+            <Text style={styles.emptyText}>{emptyText}</Text>
           </View>
         }
       />

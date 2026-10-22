@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useRef, useState } from "react";
-import { mockCurrentUser } from "../../constants/MockCurrentUser";
+
+import { useEffect, useRef, useState } from "react";
 
 import {
   FlatList,
@@ -12,56 +12,140 @@ import {
   View,
 } from "react-native";
 
-import MessageBubble from "../../components/MessageBubble";
-import MessageInput from "../../components/MessageInput";
-import { mockConversations } from "../../constants/MockConversations";
-import { mockMessages } from "../../constants/MockMessages";
-import { Message } from "../../types/Message";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import MessageBubble from "../../components/MessageBubble";
+import MessageInput from "../../components/MessageInput";
+
+import { mockCurrentUser } from "../../constants/MockCurrentUser";
 import { Colors } from "../../constants/Theme";
+
+import {
+  getConversationMessages,
+  getUserByUsername,
+  sendMessage,
+} from "../../services/api";
+
+import type { Message } from "../../types/Message";
 
 export default function Chat() {
   const router = useRouter();
 
-  const { id } = useLocalSearchParams<{
+  const { id, name } = useLocalSearchParams<{
     id: string;
+    name?: string;
   }>();
 
-  const conversation = mockConversations.find((item) => item.id === id);
-
-  const [messages, setMessages] = useState<Message[]>(mockMessages[id] ?? []);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const [newMessage, setNewMessage] = useState("");
 
+  const [currentBackendUserId, setCurrentBackendUserId] = useState<
+    string | null
+  >(null);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const [isSending, setIsSending] = useState(false);
+
+  const [sendError, setSendError] = useState<string | null>(null);
+
   const messageListRef = useRef<FlatList<Message>>(null);
 
-  function handleSend() {
+  const conversationName =
+    typeof name === "string" && name.trim() !== "" ? name : "Conversation";
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMessages() {
+      setIsLoading(true);
+      setLoadError(null);
+
+      try {
+        const currentUser = await getUserByUsername(mockCurrentUser.username);
+        const apiMessages = await getConversationMessages(id, currentUser.id);
+
+        if (cancelled) {
+          return;
+        }
+
+        setCurrentBackendUserId(currentUser.id);
+        setMessages(
+          apiMessages.map((message) => ({
+            id: message.id,
+            senderId: message.senderId,
+            content: message.content,
+            createdAt: message.createdAt,
+          })),
+        );
+      } catch (error) {
+        console.error("Failed to load messages:", error);
+
+        if (!cancelled) {
+          setLoadError("Unable to load messages.");
+          setMessages([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadMessages();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  async function handleSend() {
     const trimmedMessage = newMessage.trim();
 
-    if (trimmedMessage === "") {
+    if (trimmedMessage === "" || !currentBackendUserId || isSending) {
       return;
     }
 
-    const message: Message = {
-      id: Date.now().toString(),
-      senderId: mockCurrentUser.id,
-      content: trimmedMessage,
-      createdAt: new Date().toISOString(),
-    };
+    setIsSending(true);
+    setSendError(null);
 
-    setMessages((currentMessages) => [...currentMessages, message]);
+    try {
+      const createdMessage = await sendMessage(
+        id,
+        currentBackendUserId,
+        trimmedMessage,
+      );
+      const message: Message = {
+        id: createdMessage.id,
+        senderId: createdMessage.senderId,
+        content: createdMessage.content,
+        createdAt: createdMessage.createdAt,
+      };
 
-    setNewMessage("");
+      setMessages((currentMessages) => [...currentMessages, message]);
+
+      setNewMessage("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
+
+      setSendError("Message could not be sent.");
+    } finally {
+      setIsSending(false);
+    }
   }
 
-  if (!conversation) {
-    return (
-      <View style={styles.center}>
-        <Text>Conversation not found.</Text>
-      </View>
-    );
+  let emptyTitle = "No messages yet";
+  let emptyText = "Send the first message.";
+
+  if (!isLoading) {
+    emptyTitle = "Loading messages...";
+    emptyText = "Retrieving messages from Cipher.";
+  } else if (loadError) {
+    emptyTitle = "Unable to load messages";
+    emptyText = loadError;
   }
 
   return (
@@ -83,7 +167,7 @@ export default function Chat() {
             <Text style={styles.backText}>Back</Text>
           </Pressable>
 
-          <Text style={styles.name}>{conversation.name}</Text>
+          <Text style={styles.name}>{conversationName}</Text>
         </View>
 
         <FlatList
@@ -93,7 +177,7 @@ export default function Chat() {
           renderItem={({ item }) => (
             <MessageBubble
               message={item}
-              isMine={item.senderId === mockCurrentUser.id}
+              isMine={item.senderId === currentBackendUserId}
             />
           )}
           contentContainerStyle={styles.messageList}
@@ -105,17 +189,22 @@ export default function Chat() {
           }}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyTitle}>No messages yet</Text>
+              <Text style={styles.emptyTitle}>{emptyTitle}</Text>
 
-              <Text style={styles.emptyText}>Send the first message.</Text>
+              <Text style={styles.emptyText}>{emptyText}</Text>
             </View>
           }
         />
+
+        {sendError && <Text style={styles.sendError}>{sendError}</Text>}
 
         <MessageInput
           value={newMessage}
           onChangeText={setNewMessage}
           onSend={handleSend}
+          disabled={
+            isSending || currentBackendUserId === null || loadError !== null
+          }
         />
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -179,6 +268,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: Colors.secondaryText,
     marginTop: 6,
+  },
+
+  sendError: {
+    color: Colors.error,
+    fontSize: 13,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
   },
 
   safeArea: {

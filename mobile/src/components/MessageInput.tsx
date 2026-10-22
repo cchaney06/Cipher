@@ -6,14 +6,16 @@ interface MessageInputProps {
   value: string;
   onChangeText: (text: string) => void;
   onSend: () => void;
+  disabled?: boolean;
 }
 
 export default function MessageInput({
   value,
   onChangeText,
   onSend,
+  disabled = false,
 }: MessageInputProps) {
-  const canSend = value.trim().length > 0;
+  const canSend = !disabled && value.trim().length > 0;
 
   return (
     <View style={styles.container}>
